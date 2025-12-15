@@ -130,13 +130,13 @@ Note: You may be prompted for your administrator password.
 
 2. **Update your Hosts File**: 
 
-# Map the domain frontend.local to localhost (127.0.0.1).
+**Map the domain frontend.local to localhost (127.0.0.1)**.
 
 Windows: C:\Windows\System32\drivers\etc\hosts
 
 Mac/Linux: /etc/hosts
 
-# Add this line to the bottom:
+**Add this line to the bottom:**
 
 127.0.0.1 frontend.local
 
