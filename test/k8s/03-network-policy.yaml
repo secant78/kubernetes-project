@@ -12,7 +12,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-frontend-ingress
+  name: allow-frontend-logic
   namespace: k8s-assessment
 spec:
   podSelector:
@@ -24,26 +24,38 @@ spec:
   ingress:
   - {} # Allow all external traffic to frontend
   egress:
+  # Allow Frontend -> Backend A (Port 80)
   - to:
     - podSelector:
         matchLabels:
           app: backend-a
+    ports:
+    - protocol: TCP
+      port: 8080
+  # Allow Frontend -> Backend B (Port 80)
+  - to:
     - podSelector:
         matchLabels:
           app: backend-b
     ports:
     - protocol: TCP
       port: 8080
+  # Allow DNS (Critical for Service Discovery)
+  - ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-backend-db
+  name: allow-backend-a-ingress
   namespace: k8s-assessment
 spec:
   podSelector:
     matchLabels:
-      tier: backend
+      app: backend-a
   policyTypes:
   - Ingress
   - Egress
@@ -54,7 +66,7 @@ spec:
           app: frontend
     ports:
     - protocol: TCP
-      port: 8080
+      port: 8080  # <--- CHANGE THIS to match your 'containerPort'
   egress:
   - to:
     - podSelector:
@@ -63,6 +75,48 @@ spec:
     ports:
     - protocol: TCP
       port: 5432
+  - ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-b-ingress
+  namespace: k8s-assessment
+spec:
+  podSelector:
+    matchLabels:
+      app: backend-b  # Explicitly target Backend B
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow Frontend -> Backend B
+  - from:
+    - podSelector:
+        matchLabels:
+          app: frontend
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow Backend B -> Postgres
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow DNS
+  - ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -76,10 +130,14 @@ spec:
   policyTypes:
   - Ingress
   ingress:
+  # Allow Backend A & B -> Postgres
   - from:
     - podSelector:
         matchLabels:
-          tier: backend
+          app: backend-a
+    - podSelector:
+        matchLabels:
+          app: backend-b
     ports:
     - protocol: TCP
       port: 5432

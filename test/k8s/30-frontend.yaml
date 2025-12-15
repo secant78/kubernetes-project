@@ -4,7 +4,7 @@ metadata:
   name: frontend-service
   namespace: k8s-assessment
 spec:
-  type: LoadBalancer # Use NodePort if running locally without LB support
+  type: NodePort # Use NodePort if running locally without LB support
   selector:
     app: frontend
   ports:
@@ -35,7 +35,7 @@ spec:
         resources:
           requests:
             memory: "64Mi"
-            cpu: "50m"
+            cpu: "20m"
           limits:
             memory: "128Mi"
             cpu: "100m"

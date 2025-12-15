@@ -35,5 +35,9 @@ kubectl apply -f k8s/30-frontend.yaml
 echo "Applying HPA..."
 kubectl apply -f k8s/40-hpa.yaml
 
+# 8. Ingress
+echo "Setting up Ingress..."
+kubectl apply -f k8s/50-ingress.yaml
+
 echo "Deployment Complete! Checking status..."
 kubectl get all -n k8s-assessment
