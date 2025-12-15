@@ -113,6 +113,8 @@ Wait for the ingress-nginx pods to be "Running" in the ingress-nginx namespace.
 kubectl get pods -n k8s-assessment
 ```
 
+---
+
 ## How to Access the Application
 
 ### Steps
@@ -145,6 +147,7 @@ Mac/Linux: /etc/hosts
 
 Open http://frontend.local
 
+---
 
 ## How to Verify Deployment
 
@@ -161,7 +164,7 @@ kubectl get all -n k8s-assessment
 
 We have implemented a "Default Deny" policy. Verify traffic flow using these commands:
 
-# Test 1: Frontend -> Backend (Should SUCCEED)
+**Test 1: Frontend -> Backend (Should SUCCEED)**
 
 ```sh
 FRONTEND_POD=$(kubectl get pod -l app=frontend -n k8s-assessment -o jsonpath="{.items[0].metadata.name}")
@@ -172,7 +175,7 @@ kubectl exec -it $FRONTEND_POD -n k8s-assessment -- curl -v http://backend-a-ser
 Expected Output: HTTP/1.1 404 Not Found (This confirms connection was allowed).
 
 
-# Test 2: Frontend -> Database (Should FAIL/TIMEOUT)
+**Test 2: Frontend -> Database (Should FAIL/TIMEOUT)**
 
 ```sh
 kubectl exec -it $FRONTEND_POD -n k8s-assessment -- nc -zv postgres-service 5432
